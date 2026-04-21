@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
+// Triggering fresh Vercel deployment
 export async function POST(req: NextRequest) {
   try {
     const { message, history } = await req.json();
