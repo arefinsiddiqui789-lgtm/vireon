@@ -12,7 +12,16 @@ export async function POST(req: NextRequest) {
     }
 
     const ZAI = (await import("z-ai-web-dev-sdk")).default;
-    const zai = await ZAI.create();
+    let zai;
+    try {
+      zai = await ZAI.create();
+    } catch (e) {
+      console.error("ZAI Initialization Error:", e);
+      return NextResponse.json(
+        { error: "AI Service initialization failed. Check your API keys." },
+        { status: 500 }
+      );
+    }
 
     // Build conversation messages
     const systemMessage = {

@@ -22,7 +22,16 @@ export async function POST(req: NextRequest) {
 
     // Use z-ai-web-dev-sdk to execute code via LLM
     const ZAI = (await import("z-ai-web-dev-sdk")).default;
-    const zai = await ZAI.create();
+    let zai;
+    try {
+      zai = await ZAI.create();
+    } catch (e) {
+      console.error("ZAI Initialization Error (Code Execution):", e);
+      return NextResponse.json(
+        { error: "Code execution engine failed to start." },
+        { status: 500 }
+      );
+    }
 
     const completion = await zai.chat.completions.create({
       messages: [
