@@ -95,9 +95,9 @@ export function SmartHelperSection() {
               <Bot size={22} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Smart Helper</h2>
+              <h2 className="text-2xl font-bold">Vireon Bro</h2>
               <p className="text-sm text-muted-foreground">
-                Your CSE study companion
+                Your CSE study buddy
               </p>
             </div>
           </div>
@@ -134,7 +134,7 @@ export function SmartHelperSection() {
               <Sparkles size={36} className="text-primary" />
             </motion.div>
             <h3 className="text-xl font-semibold mb-2">
-              Ask me anything about Computer Science!
+              Hey! Vireon Bro here — ask me anything!
             </h3>
             <p className="text-muted-foreground mb-8 max-w-md">
               I can explain concepts, help with algorithms, data structures, and
@@ -261,7 +261,7 @@ export function SmartHelperSection() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a CSE question..."
+              placeholder="Ask Vireon Bro anything..."
               rows={1}
               disabled={isLoading}
               className={cn(

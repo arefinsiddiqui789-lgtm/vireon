@@ -27,7 +27,7 @@ const NAV_ITEMS: { id: ActiveSection; label: string; icon: React.ReactNode }[] =
   { id: "goals", label: "Daily Goals", icon: <Target size={20} /> },
   { id: "gym", label: "Gym Routine", icon: <Dumbbell size={20} /> },
   { id: "compiler", label: "Code Compiler", icon: <Code2 size={20} /> },
-  { id: "helper", label: "Smart Helper", icon: <Bot size={20} /> },
+  { id: "helper", label: "Vireon Bro", icon: <Bot size={20} /> },
   { id: "overview", label: "Overview", icon: <CalendarDays size={20} /> },
 ];
 
