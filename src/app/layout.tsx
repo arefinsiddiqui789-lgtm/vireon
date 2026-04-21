@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   keywords: ["Vireon", "CSE", "Productivity", "Study Planner", "Code Compiler", "Student Dashboard"],
   authors: [{ name: "Arefin Siddiqui" }],
   icons: {
-    icon: "/logo.svg",
+    icon: "/logo.png",
   },
 };
 

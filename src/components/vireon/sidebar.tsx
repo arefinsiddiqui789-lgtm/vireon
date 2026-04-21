@@ -76,7 +76,7 @@ export function Sidebar() {
         <div className="flex items-center gap-3 px-3 mb-8">
           <div className="relative w-10 h-10 rounded-xl overflow-hidden vireon-glow flex items-center justify-center bg-primary">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="Vireon Logo"
               width={32}
               height={32}
