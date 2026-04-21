@@ -26,10 +26,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-black">
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-black">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSection}

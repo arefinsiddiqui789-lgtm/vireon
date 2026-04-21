@@ -133,10 +133,11 @@ function CircularProgress({
           className={cn(
             value === max && max > 0 ? "text-emerald-500" : "text-emerald-500/80"
           )}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
           strokeDasharray={circumference}
+          strokeDashoffset={offset}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">

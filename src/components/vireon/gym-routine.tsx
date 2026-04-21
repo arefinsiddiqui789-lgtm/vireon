@@ -431,10 +431,11 @@ export function GymRoutineSection() {
             {/* Progress bar */}
             <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
               <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${(completedDaysCount / 7) * 100}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
                 className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600"
+                style={{ width: `${(completedDaysCount / 7) * 100}%` }}
               />
             </div>
           </CardContent>
@@ -792,9 +793,11 @@ export function GymRoutineSection() {
                 {/* Step progress bar */}
                 <div className="h-1.5 bg-muted">
                   <motion.div
-                    animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
                     className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600"
+                    style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
                   />
                 </div>
                 <CardHeader>

@@ -394,10 +394,11 @@ function RateRow({
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${rate}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
           className={cn("h-full rounded-full", color)}
+          style={{ width: `${rate}%` }}
         />
       </div>
     </div>
@@ -515,10 +516,10 @@ function DaySnapshotCard({
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
               <div className="px-4 pb-4 pt-0 border-t border-border/50">
