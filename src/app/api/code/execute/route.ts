@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+}) : null;
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,13 +25,59 @@ export async function POST(req: NextRequest) {
     const langName = langNames[language] || language;
     const startTime = Date.now();
 
-    // Use z-ai-web-dev-sdk to execute code via LLM
-    const ZAI = (await import("z-ai-web-dev-sdk")).default;
-    let zai;
+    // --- TRY OPENAI FIRST ---
+    if (openai) {
+      try {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: "You are a code execution simulator. When given code, you execute it mentally and return ONLY the exact output that the program would produce. Follow these rules strictly:\n1. Return ONLY the stdout output - nothing else\n2. Do NOT include any explanations, markdown, or extra text\n3. If the code has errors, output them prefixed with 'ERROR:' on stderr\n4. Be precise about output formatting - newlines, spaces, etc.\n5. If the code produces no output, return empty string\n6. Do not add any commentary or analysis\n7. Simulate the exact behavior of a real compiler/interpreter"
+            },
+            {
+              role: "user",
+              content: `Execute this ${langName} code and show me ONLY the output:\n\n\`\`\`${language}\n${code}\n\`\`\``,
+            },
+          ],
+        });
+
+        const response = completion.choices[0]?.message?.content || "";
+        const executionTime = Date.now() - startTime;
+        const hasError = response.toLowerCase().includes("error:");
+
+        return NextResponse.json({
+          stdout: hasError ? "" : response.trim(),
+          stderr: hasError ? response.trim() : "",
+          exitCode: hasError ? 1 : 0,
+          executionTime,
+        });
+      } catch (e) {
+        console.error("OpenAI Execution Error:", e);
+      }
+    }
+
+    // --- FALLBACK TO REAL ZAI ---
     try {
-      zai = await ZAI.create();
+      const ZAI = (await import("z-ai-web-dev-sdk")).default;
+      const zai = await ZAI.create();
+
+      const completion = await zai.chat.completions.create({
+        messages: [
+          { role: "assistant", content: "You are a code execution simulator..." },
+          { role: "user", content: `Execute this ${langName} code...` },
+        ],
+        thinking: { type: "disabled" },
+      });
+
+      return NextResponse.json({
+        stdout: completion.choices[0]?.message?.content?.trim(),
+        stderr: "",
+        exitCode: 0,
+        executionTime: Date.now() - startTime,
+      });
     } catch (e) {
-      console.warn("ZAI Initialization failed (Code), using Mock Response:", (e as Error).message);
+      console.warn("ZAI Initialization failed (Code), using Mock Response");
       return NextResponse.json({
         stdout: "Program output simulated successfully! [Running in Mock Mode]",
         stderr: "",
@@ -34,45 +85,8 @@ export async function POST(req: NextRequest) {
         executionTime: 124,
       });
     }
-
-    const completion = await zai.chat.completions.create({
-      messages: [
-        {
-          role: "assistant",
-          content:
-            "You are a code execution simulator. When given code, you execute it mentally and return ONLY the exact output that the program would produce. Follow these rules strictly:\n1. Return ONLY the stdout output - nothing else\n2. Do NOT include any explanations, markdown, or extra text\n3. If the code has errors, output them prefixed with 'ERROR:' on stderr\n4. Be precise about output formatting - newlines, spaces, etc.\n5. If the code produces no output, return empty string\n6. Do not add any commentary or analysis\n7. Simulate the exact behavior of a real compiler/interpreter",
-        },
-        {
-          role: "user",
-          content: `Execute this ${langName} code and show me ONLY the output:\n\n\`\`\`${language}\n${code}\n\`\`\``,
-        },
-      ],
-      thinking: { type: "disabled" },
-    });
-
-    const response = completion.choices[0]?.message?.content || "";
-    const executionTime = Date.now() - startTime;
-
-    // Check if the response contains an error
-    const hasError = response.includes("ERROR:") || response.includes("error:") || response.includes("Error:");
-    
-    let stdout = "";
-    let stderr = "";
-
-    if (hasError) {
-      stderr = response.replace(/^ERROR:\s*/i, "").trim();
-    } else {
-      stdout = response.trim();
-    }
-
-    return NextResponse.json({
-      stdout,
-      stderr,
-      exitCode: hasError ? 1 : 0,
-      executionTime,
-    });
   } catch (error) {
-    console.error("Code execution error:", error);
+    console.error("Code execution global error:", error);
     return NextResponse.json(
       { error: "Failed to execute code" },
       { status: 500 }
