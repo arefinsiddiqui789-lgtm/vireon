@@ -36,32 +36,36 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // --- TRY GEMINI (MULTI-MODEL FALLBACK) ---
+    // --- TRY GEMINI (MULTI-VERSION FALLBACK) ---
     const geminiKey = (process.env.GEMINI_API_KEY || "AIzaSyAxMnEzO6ql7oYtUoa54Kbaeq8Y59smVCQ").trim();
     let lastError = "";
     if (geminiKey) {
+      const versions = ["v1", "v1beta"];
       const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
-      for (const model of models) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
-          const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: `You are Vireon Bro, a CSE assistant. Creator: Arefin Siddiqui. \n\nQuestion: ${message}` }] }]
-            })
-          });
+      
+      for (const ver of versions) {
+        for (const model of models) {
+          try {
+            const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${geminiKey}`;
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: `You are Vireon Bro, a CSE assistant. Creator: Arefin Siddiqui. \n\nQuestion: ${message}` }] }]
+              })
+            });
 
-          if (response.ok) {
-            const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) return NextResponse.json({ response: text });
-          } else {
-            const err = await response.json();
-            lastError = err.error?.message || response.statusText;
+            if (response.ok) {
+              const data = await response.json();
+              const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) return NextResponse.json({ response: text });
+            } else {
+              const err = await response.json().catch(() => ({}));
+              lastError = `[${ver}/${model}] ` + (err.error?.message || response.statusText || "Unknown Error");
+            }
+          } catch (e: any) {
+            lastError = `[${ver}/${model}] ` + e.message;
           }
-        } catch (e: any) {
-          lastError = e.message;
         }
       }
     }
