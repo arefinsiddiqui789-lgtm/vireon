@@ -36,9 +36,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // --- TRY GEMINI (MULTI-VERSION FALLBACK) ---
-    const geminiKey = (process.env.GEMINI_API_KEY || "AIzaSyAxMnEzO6ql7oYtUoa54Kbaeq8Y59smVCQ").trim();
+    // --- TRY GEMINI (SECURE MODE) ---
+    const geminiKey = (process.env.GEMINI_API_KEY || "").trim();
     let lastError = "";
+    
     if (geminiKey) {
       const versions = ["v1", "v1beta"];
       const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
@@ -70,9 +71,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // --- LAST RESORT: FALLBACK ---
+    // --- FALLBACK ---
     return NextResponse.json({ 
-      response: `Yo! My brain is foggy. Error: ${lastError.substring(0, 50)}. Try again, bro! 🚀` 
+      response: geminiKey 
+        ? `Yo! I'm trying to wake up, but Google says: ${lastError}. Check your key, bro! 🚀` 
+        : "Yo! I can't find my AI Brain (GEMINI_API_KEY is missing in Vercel). Add it and I'll be back! 🚀"
     });
   } catch (error) {
     console.error("Global Error:", error);
