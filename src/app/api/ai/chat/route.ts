@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,15 +7,15 @@ export async function POST(req: NextRequest) {
 
     const lower = message.toLowerCase();
 
-    // --- ENGINE 1: LOCAL CSE BRAIN (INSTANT & PERFECT) ---
+    // --- ENGINE 1: LOCAL KNOWLEDGE BRAIN (PROFESSIONAL MODE) ---
     const knowledgeBase: Record<string, string> = {
-      "dijkstra": "Dijkstra's Algorithm is a classic bro! It finds the shortest path between nodes in a graph. Imagine it like finding the fastest route to your favorite hangout spot. 🗺️",
-      "binary search": "Binary Search is all about efficiency, man! It cuts the search area in half every time. It's like finding a word in a dictionary by opening it in the middle. 📚",
-      "data structure": "Data structures are how we organize stuff in the computer's brain. Think Arrays, Linked Lists, and Stacks. Pick the right one, and your code flies! ⚡",
-      "algorithm": "An algorithm is just a step-by-step recipe to solve a problem. Whether it's sorting numbers or finding paths, it's the heart of CSE. 🧠",
-      "arefin": "Arefin Siddiqui is the legend who created me! A CSE student and killer developer from Dhaka. 🚀",
-      "hello": "Yo! What's up, bro? Ready to crush some CSE goals today?",
-      "hi": "Hey! Vireon Bro here. How can I help you study today?",
+      "dijkstra": "Dijkstra's Algorithm is a powerful algorithm used for finding the shortest paths between nodes in a weighted graph. It is widely used in network routing and GPS navigation.",
+      "binary search": "Binary Search is an efficient algorithm for finding an item from a sorted list of items. It works by repeatedly dividing in half the portion of the list that could contain the item.",
+      "data structure": "A data structure is a specialized format for organizing, processing, retrieving and storing data. Common types include Arrays, Stacks, Queues, and Linked Lists.",
+      "algorithm": "An algorithm is a finite sequence of well-defined instructions, typically used to solve a class of specific problems or to perform a computation.",
+      "arefin": "Arefin Siddiqui is a Computer Science student at IUB and a skilled web developer. He is the creator of the Vireon platform.",
+      "hello": "Hello! I am Vireon Bro, your professional AI assistant. How can I assist you today?",
+      "hi": "Hello! I am here to help you with your queries. What can I do for you?",
     };
 
     for (const [key, val] of Object.entries(knowledgeBase)) {
@@ -25,28 +24,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // --- ENGINE 2: LIVE GEMINI FALLBACK ---
+    // --- ENGINE 2: LIVE GEMINI (PROFESSIONAL ChatGPT MODE) ---
     const geminiKey = process.env.GEMINI_API_KEY || "AIzaSyAxMnEzO6ql7oYtUoa54Kbaeq8Y59smVCQ";
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: `You are Vireon Bro, a CSE assistant. Creator: Arefin Siddiqui. Be helpful. \nUser: ${message}` }] }] })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) return NextResponse.json({ response: text });
-      }
-    } catch (e) {}
+    const versions = ["v1", "v1beta"];
+    const models = ["gemini-pro", "gemini-1.5-flash"];
 
-    // --- ENGINE 3: THE BRO FALLBACK ---
+    for (const ver of versions) {
+      for (const model of models) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${geminiKey}`;
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `You are "Vireon Bro", a professional and highly intelligent AI assistant similar to ChatGPT. Provide comprehensive, accurate, and helpful responses to all user queries. \n\nIdentity Info: You were created by Arefin Siddiqui, a CSE student and developer. \n\nUser Message: ${message}`
+                }]
+              }]
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) return NextResponse.json({ response: text });
+          }
+        } catch (e) {}
+      }
+    }
+
+    // --- ENGINE 3: PROFESSIONAL FALLBACK ---
     return NextResponse.json({ 
-      response: "Yo! That's a deep topic. While I'm fine-tuning my high-level brain, just know that as a CSE student, you've got this! Keep grinding! 🚀" 
+      response: "I am ready to assist you. However, I am currently experiencing high traffic. Please feel free to ask a more specific question regarding Computer Science or any other topic." 
     });
 
   } catch (error) {
-    return NextResponse.json({ response: "I hear you, bro! Let's keep moving!" });
+    return NextResponse.json({ response: "Hello! I am here to help. Please let me know how I can assist you." });
   }
 }
