@@ -52,7 +52,8 @@ export async function POST(req: NextRequest) {
     let apiError = "";
     if (geminiKey && geminiKey !== "") {
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+        // Switching to v1 stable API and using the correct model path
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
         const geminiResponse = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
