@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     
     if (geminiKey) {
       const versions = ["v1", "v1beta"];
-      const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
+      const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite-preview-02-05"];
       
       for (const ver of versions) {
         for (const model of models) {
