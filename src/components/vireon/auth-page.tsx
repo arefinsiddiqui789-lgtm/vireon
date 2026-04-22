@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { signalJustLoggedIn } from "@/lib/events";
 import { Input } from "@/components/ui/input";
@@ -43,6 +43,22 @@ export function AuthPage() {
   const [signupEmailInput, setSignupEmailInput] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+
+  // Handle URL errors (e.g. from NextAuth redirects)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get("error");
+      if (error) {
+        // Map common NextAuth errors to friendly messages
+        const messages: Record<string, string> = {
+          "CredentialsSignin": "Invalid email or password",
+          "default": "An error occurred during sign in"
+        };
+        setTimeout(() => toast.error(messages[error] || messages.default), 500);
+      }
+    }
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
