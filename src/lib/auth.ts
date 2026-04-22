@@ -18,6 +18,17 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email and password are required");
         }
 
+        // --- GUEST MODE BYPASS ---
+        if (credentials.email.toLowerCase() === "guest@vireon.com") {
+          console.log("Guest mode login detected");
+          return {
+            id: "guest-id",
+            email: "guest@vireon.com",
+            name: "Guest User",
+            image: null,
+          };
+        }
+
         try {
           const user = await db.user.findUnique({
             where: { email: credentials.email.toLowerCase() },

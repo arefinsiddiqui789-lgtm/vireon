@@ -344,6 +344,24 @@ export function AuthPage() {
                     </div>
                   </div>
 
+                  {/* Guest Mode */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-11 text-sm font-medium border-dashed border-primary/30 hover:bg-primary/5"
+                    onClick={async () => {
+                      setIsLoading(true);
+                      await signIn("credentials", {
+                        email: "guest@vireon.com",
+                        password: "password",
+                        callbackUrl: "/",
+                      });
+                    }}
+                    disabled={isLoading}
+                  >
+                    Enter as Guest (Demo Mode)
+                  </Button>
+
                   {/* Submit */}
                   <Button
                     type="submit"
