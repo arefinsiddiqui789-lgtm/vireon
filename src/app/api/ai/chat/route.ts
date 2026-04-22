@@ -47,28 +47,25 @@ export async function POST(req: NextRequest) {
     }
 
     // --- FALLBACK TO REAL ZAI ---
-    try {
-      const ZAI = (await import("z-ai-web-dev-sdk")).default;
-      const zai = await ZAI.create();
-      
-      const messages = [
-        { role: "assistant" as const, content: "You are Vireon Bro..." },
-        ...(history || []).slice(-10),
-        { role: "user" as const, content: message },
-      ];
+    // --- FALLBACK: SMART SIMULATED AI (NO KEY NEEDED) ---
+    console.warn("AI Service using Smart Simulation");
+    
+    const lowerMessage = message.toLowerCase();
+    let simulatedResponse = "";
 
-      const completion = await zai.chat.completions.create({
-        messages,
-        thinking: { type: "disabled" },
-      });
-
-      return NextResponse.json({ response: completion.choices[0]?.message?.content });
-    } catch (e: any) {
-      console.warn("AI Service unavailable, using Mock Response");
-      return NextResponse.json({ 
-        response: "Yo! It's Vireon Bro. I'm currently in 'offline mode' because my AI core is waiting for an API key. But normally, I'd stay here and help you crush your CSE goals! Once you add the key (OPENAI_API_KEY), I'll be fully powered up. 🚀" 
-      });
+    if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey")) {
+      simulatedResponse = "Yo! What's up, bro? I'm Vireon Bro, your CSE command center assistant. Ready to crush some code or study today? 🚀";
+    } else if (lowerMessage.includes("who are you") || lowerMessage.includes("who made you")) {
+      simulatedResponse = "I'm Vireon Bro, created by the legend Arefin Siddiqui! He's a CSE student at IUB and a killer web developer. He built me to help you stay productive. 💻";
+    } else if (lowerMessage.includes("code") || lowerMessage.includes("programming")) {
+      simulatedResponse = "Coding is the soul of CSE, man! Whether it's Python, C++, or Java, just keep grinding. Remember: 'First, solve the problem. Then, write the code.' Need help with a specific concept? ⚡";
+    } else if (lowerMessage.includes("data structure") || lowerMessage.includes("algorithm")) {
+      simulatedResponse = "Algorithms are like recipes for success! Whether it's a Binary Search or a Quick Sort, it's all about efficiency. What concept are you tackling right now? 🧠";
+    } else {
+      simulatedResponse = "I hear you, bro! That's a solid topic. While my 'Deep Thinking' core is waiting for an API key, I'm here to push you forward. Keep focusing on your CSE goals—you've got this! 🚀";
     }
+
+    return NextResponse.json({ response: simulatedResponse });
   } catch (error) {
     console.error("AI Chat Global Error:", error);
     return NextResponse.json(
